@@ -1,0 +1,28 @@
+relationship 77004ce2-39ea-2f5d-848a-6c73a93b5b89
+	fromColumn: Fuel.'Truck ID'
+	toColumn: DimTruck.'Truck ID'
+
+relationship 8156a1fa-76d9-d687-bc76-569ba98d7014
+	fromColumn: Maintenance.'Truck ID'
+	toColumn: DimTruck.'Truck ID'
+
+relationship 3ea2bf5d-e058-fe2a-a1ef-bd693b0c90fc
+	fromColumn: DriverPerformance.'Truck ID'
+	toColumn: DimTruck.'Truck ID'
+
+relationship 42182da8-2004-ea30-9f1f-7c7acabd8066
+	fromColumn: Fuel.'Driver Name'
+	toColumn: DimDriver.'Driver Name'
+
+relationship aa839c8f-28ba-b162-bfde-a462d61c6ddb
+	fromColumn: DriverPerformance.'Driver Name'
+	toColumn: DimDriver.'Driver Name'
+
+relationship 1e8d41f0-bc20-ae56-a918-68a6c225ccb3
+	fromColumn: Fuel.Date
+	toColumn: DimDate.Date
+
+relationship e3927a13-1456-cb5b-cb71-9a5ff6dc077b
+	fromColumn: Maintenance.Date
+	toColumn: DimDate.Date
+

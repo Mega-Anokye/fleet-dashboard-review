@@ -1,0 +1,31 @@
+table DimDriver
+	lineageTag: df95b1d7-fda8-4aab-af3e-c643e6c1a014
+
+	column 'Driver Name'
+		lineageTag: 947cd9f4-c917-48dd-9eb5-d863fc3263cf
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Driver Name]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimDriver = calculated
+		mode: import
+		source =
+				
+				DISTINCT(
+				    UNION(
+				        SELECTCOLUMNS(
+				            Fuel,
+				            "Driver Name", Fuel[Driver Name]
+				        ),
+				        SELECTCOLUMNS(
+				            DriverPerformance,
+				            "Driver Name",
+				                DriverPerformance[Driver Name]
+				        )
+				    )
+				)
+
+	annotation PBI_Id = c9d8bd80f1d347c7bbad9323230dafc5
+

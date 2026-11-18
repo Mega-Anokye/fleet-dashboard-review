@@ -1,0 +1,178 @@
+table Maintenance
+	lineageTag: 558d67c8-d72c-417c-bf90-15b9e07938cc
+
+	column SN
+		dataType: int64
+		formatString: 0
+		lineageTag: 9b68d44f-b065-4c8e-b4fe-44a0a0c7d7d7
+		summarizeBy: sum
+		sourceColumn: SN
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Truck ID'
+		dataType: string
+		lineageTag: 2fc1c688-66fd-4292-903c-a432c70f5165
+		summarizeBy: none
+		sourceColumn: Truck ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date
+		dataType: dateTime
+		formatString: dd mmm yyyy
+		lineageTag: ae572bc4-6229-4c77-ae74-d5e74829efa1
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Maintenance Type'
+		dataType: string
+		lineageTag: edbd52f2-21c1-41ee-8340-30339f36f05c
+		summarizeBy: none
+		sourceColumn: Maintenance Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column Priority
+		dataType: string
+		lineageTag: 591059b8-299d-4971-8f3a-749fe2bb664b
+		summarizeBy: none
+		sourceColumn: Priority
+
+		annotation SummarizationSetBy = Automatic
+
+	column Description
+		dataType: string
+		lineageTag: 27a8950d-897b-4669-b72e-110278f064bd
+		summarizeBy: none
+		sourceColumn: Description
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Part Replaced'
+		dataType: string
+		lineageTag: 59827fc4-2e7b-4f7b-995b-528a7b3cf785
+		summarizeBy: none
+		sourceColumn: Part Replaced
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Mechanic Name'
+		dataType: string
+		lineageTag: 65624500-8a1d-4fc8-a349-b28eb8951b3e
+		summarizeBy: none
+		sourceColumn: Mechanic Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Downtime_Days
+		dataType: double
+		lineageTag: 1cfbda0b-a969-4640-bb43-ab2954d01f33
+		summarizeBy: sum
+		sourceColumn: Downtime_Days
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Cost_USD
+		dataType: double
+		lineageTag: b7c53b1e-9700-47bf-bbf1-13b2769ba231
+		summarizeBy: sum
+		sourceColumn: Cost_USD
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Remarks
+		dataType: string
+		lineageTag: 8746e8a7-35eb-44e2-a694-c2247cf00c83
+		summarizeBy: none
+		sourceColumn: Remarks
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Maintenance Type Clean'
+		dataType: string
+		lineageTag: 30a18d2f-a822-4304-8400-8dd90be97dcc
+		summarizeBy: none
+		sourceColumn: Maintenance Type Clean
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Priority Clean'
+		dataType: string
+		lineageTag: 986ef986-b1ed-457f-b41a-3c5903bc5e16
+		summarizeBy: none
+		sourceColumn: Priority Clean
+		sortByColumn: 'Priority Order'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Part Category'
+		dataType: string
+		lineageTag: d8ed3f3e-6d56-4e91-a9e3-5965cc468177
+		summarizeBy: none
+		sourceColumn: Part Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Priority Order' = SWITCH(TRIM(Maintenance[Priority]), "Low", 1, "Medium", 2, "High", 3, "Critical", 4, 5)
+		dataType: int64
+		isHidden
+		lineageTag: a6a321c4-b126-43fc-90ee-72c5cddbc65f
+		summarizeBy: none
+
+	partition Maintenance = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "maintenance_log_actros_usd.csv"),[Delimiter=",", Columns=11, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"SN", Int64.Type}, {"Truck ID", type text}, {"Date", type date}, {"Maintenance Type", type text}, {"Priority", type text}, {"Description", type text}, {"Part Replaced", type text}, {"Mechanic Name", type text}, {"Downtime_Days", type number}, {"Cost_USD", type number}, {"Remarks", type text}}),
+				    #"Trimmed Text" = Table.TransformColumns(#"Changed Type",{{"Truck ID", Text.Trim, type text}, {"Maintenance Type", Text.Trim, type text}, {"Priority", Text.Trim, type text}, {"Description", Text.Trim, type text}, {"Part Replaced", Text.Trim, type text}, {"Mechanic Name", Text.Trim, type text}, {"Remarks", Text.Trim, type text}}),
+				    #"Cleaned Text" = Table.TransformColumns(#"Trimmed Text",{{"Truck ID", Text.Clean, type text}, {"Maintenance Type", Text.Clean, type text}, {"Priority", Text.Clean, type text}, {"Description", Text.Clean, type text}, {"Part Replaced", Text.Clean, type text}, {"Mechanic Name", Text.Clean, type text}, {"Remarks", Text.Clean, type text}}),
+				    #"Changed Type with Locale" = Table.TransformColumnTypes(#"Cleaned Text", {{"Date", type date}}, "en-GB"),
+				    #"Changed Type with Locale1" = Table.TransformColumnTypes(#"Changed Type with Locale", {{"Cost_USD", type number}}, "en-US"),
+				    #"Added Custom" = Table.AddColumn(#"Changed Type with Locale1", "Maintenance Type Clean", each if Text.Upper(
+				    Text.Trim([Maintenance Type])
+				) = "PREVENTIVE"
+				then "Preventive"
+				else if Text.Upper(
+				    Text.Trim([Maintenance Type])
+				) = "CORRECTIVE"
+				then "Corrective"
+				else "Other"),
+				    #"Added Custom1" = Table.AddColumn(#"Added Custom", "Priority Clean", each if Text.Upper(
+				    Text.Trim([Priority])
+				) = "LOW" then "Low"
+				else if Text.Upper(
+				    Text.Trim([Priority])
+				) = "MEDIUM" then "Medium"
+				else if Text.Upper(
+				    Text.Trim([Priority])
+				) = "HIGH" then "High"
+				else if Text.Upper(
+				    Text.Trim([Priority])
+				) = "CRITICAL" then "Critical"
+				else "Other"),
+				    #"Trimmed Text1" = Table.TransformColumns(#"Added Custom1",{{"Part Replaced", Text.Trim, type text}}),
+				    #"Cleaned Text1" = Table.TransformColumns(#"Trimmed Text1",{{"Part Replaced", Text.Clean, type text}}),
+				    #"Added Custom2" = Table.AddColumn(#"Cleaned Text1", "Part Category", each if Text.Upper(
+				    Text.Trim([Part Replaced])
+				) = "N/A (SERVICE ONLY)"
+				then "Service Only"
+				else "Component Replacement"),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Added Custom2",{{"Maintenance Type Clean", type text}, {"Priority Clean", type text}, {"Part Category", type text}})
+				in
+				    #"Changed Type1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

@@ -1,0 +1,218 @@
+table Fuel
+	lineageTag: 68e951aa-f6bc-4074-b9ba-035ff321a4d1
+
+	column SN
+		dataType: int64
+		formatString: 0
+		lineageTag: b0dacab9-6b10-4739-bb39-a9505f47049d
+		summarizeBy: sum
+		sourceColumn: SN
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Truck ID'
+		dataType: string
+		lineageTag: c168591d-4848-445b-88d3-8352950de186
+		summarizeBy: none
+		sourceColumn: Truck ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date
+		dataType: dateTime
+		formatString: dd mmm yyyy
+		lineageTag: 6f0815e1-ccd5-486b-8c77-4bbb72fa9b1c
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Pump Location'
+		dataType: string
+		lineageTag: d764e752-c83d-4b31-9f1a-018f91f9b333
+		summarizeBy: none
+		sourceColumn: Pump Location
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fill / Lit'
+		dataType: double
+		lineageTag: 8dd4cd07-5686-47f7-a72f-65a3028674df
+		summarizeBy: sum
+		sourceColumn: Fill / Lit
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Start ODO'
+		dataType: int64
+		formatString: 0
+		lineageTag: fede2482-73a8-4cb1-aeeb-5f75ce169c4f
+		summarizeBy: sum
+		sourceColumn: Start ODO
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'End ODO'
+		dataType: int64
+		formatString: 0
+		lineageTag: 97bf8f51-2772-41bf-934a-449c1c15422f
+		summarizeBy: sum
+		sourceColumn: End ODO
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Coupon #'
+		dataType: string
+		lineageTag: 35895812-7e48-4166-a945-c36c21ad5474
+		summarizeBy: none
+		sourceColumn: Coupon #
+
+		annotation SummarizationSetBy = Automatic
+
+	column Route
+		dataType: string
+		lineageTag: c4d4df1f-d757-4c63-980a-a4b829a4906b
+		summarizeBy: none
+		sourceColumn: Route
+
+		annotation SummarizationSetBy = Automatic
+
+	column Route#
+		dataType: string
+		lineageTag: 5c11696d-9aaa-4f1f-8ef0-e16a41b35640
+		summarizeBy: none
+		sourceColumn: Route#
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Veh Type'
+		dataType: string
+		lineageTag: 4af3a40a-1909-47b5-9173-0a0df15223b6
+		summarizeBy: none
+		sourceColumn: Veh Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column Deployment
+		dataType: string
+		lineageTag: 56fd3106-cfd1-48eb-9a6d-6e6e479e8908
+		summarizeBy: none
+		sourceColumn: Deployment
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Driver Name'
+		dataType: string
+		lineageTag: a2518e3d-6ee6-49cd-b7b9-f48d8f878e65
+		summarizeBy: none
+		sourceColumn: Driver Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Dist Covered'
+		dataType: int64
+		formatString: 0
+		lineageTag: e1e299b1-3eec-4a5d-a4d4-a3d22271ce51
+		summarizeBy: sum
+		sourceColumn: Dist Covered
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Km / Lit'
+		dataType: double
+		lineageTag: 06941875-6f99-403e-96dc-c1514935483b
+		summarizeBy: sum
+		sourceColumn: Km / Lit
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Remarks
+		dataType: string
+		lineageTag: 575a0313-40c4-444c-b810-05f6806b409c
+		summarizeBy: none
+		sourceColumn: Remarks
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fuel Cost USD'
+		dataType: double
+		lineageTag: e027e2bb-c631-4ad9-8db3-62188b6f35d4
+		summarizeBy: sum
+		sourceColumn: Fuel Cost USD
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Pump Rate USD'
+		dataType: double
+		lineageTag: 3c0b4b77-0436-42c5-8b0d-5b0c53315a04
+		summarizeBy: sum
+		sourceColumn: Pump Rate USD
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'ODO Difference'
+		dataType: int64
+		formatString: 0
+		lineageTag: f68133b8-01c8-4d36-bf04-e41f64a128b2
+		summarizeBy: sum
+		sourceColumn: ODO Difference
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ODO Validation'
+		dataType: string
+		lineageTag: 614ea3de-bb6e-4041-9663-cfe79794fb0a
+		summarizeBy: none
+		sourceColumn: ODO Validation
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Fuel = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "fuel_sheet_actros_usd.csv"),[Delimiter=",", Columns=16, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"SN", Int64.Type}, {"Truck ID", type text}, {"Date", type date}, {"Pump Location", type text}, {"Fill / Lit", type number}, {"Start ODO", Int64.Type}, {"End ODO", Int64.Type}, {"Coupon #", type text}, {"Route", type text}, {"Route#", type text}, {"Veh Type", type text}, {"Deployment", type text}, {"Driver Name", type text}, {"Dist Covered", Int64.Type}, {"Km / Lit", type number}, {"Remarks", type text}}),
+				    #"Trimmed Text" = Table.TransformColumns(#"Changed Type",{{"Truck ID", Text.Trim, type text}, {"Pump Location", Text.Trim, type text}, {"Coupon #", Text.Trim, type text}, {"Route", Text.Trim, type text}, {"Route#", Text.Trim, type text}, {"Veh Type", Text.Trim, type text}, {"Deployment", Text.Trim, type text}, {"Driver Name", Text.Trim, type text}, {"Remarks", Text.Trim, type text}}),
+				    #"Cleaned Text" = Table.TransformColumns(#"Trimmed Text",{{"Truck ID", Text.Clean, type text}, {"Pump Location", Text.Clean, type text}, {"Coupon #", Text.Clean, type text}, {"Route", Text.Clean, type text}, {"Route#", Text.Clean, type text}, {"Veh Type", Text.Clean, type text}, {"Deployment", Text.Clean, type text}, {"Driver Name", Text.Clean, type text}, {"Remarks", Text.Clean, type text}}),
+				    #"Added Custom1" = Table.AddColumn(#"Cleaned Text", "Fuel Cost USD", each Number.FromText(
+				    Text.BetweenDelimiters(
+				        [Remarks],
+				        "Total fuel cost: $",
+				        " USD"
+				    ),
+				    "en-US"
+				)),
+				    #"Added Custom" = Table.AddColumn(#"Added Custom1", "Pump Rate USD", each Number.FromText(
+				    Text.BetweenDelimiters(
+				        [Remarks],
+				        "Pump rate: $",
+				        "/L"
+				    ),
+				    "en-US"
+				)),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Added Custom",{{"Fuel Cost USD", type number}, {"Pump Rate USD", type number}}),
+				    #"Added Custom2" = Table.AddColumn(#"Changed Type1", "ODO Difference", each [End ODO] - [Start ODO]),
+				    #"Changed Type2" = Table.TransformColumnTypes(#"Added Custom2",{{"ODO Difference", Int64.Type}}),
+				    #"Added Custom3" = Table.AddColumn(#"Changed Type2", "ODO Validation", each if [ODO Difference] = [Dist Covered]
+				then "Valid"
+				else "Mismatch"),
+				    #"Changed Type3" = Table.TransformColumnTypes(#"Added Custom3",{{"ODO Validation", type text}})
+				in
+				    #"Changed Type3"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

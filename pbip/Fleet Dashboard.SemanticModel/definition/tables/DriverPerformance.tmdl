@@ -1,0 +1,144 @@
+table DriverPerformance
+	lineageTag: ae187d4e-b100-44a8-b5bb-aeac76e96dcf
+
+	column 'Driver Name'
+		dataType: string
+		lineageTag: be93915e-2418-4671-8eff-46fa0db38628
+		summarizeBy: none
+		sourceColumn: Driver Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Truck ID'
+		dataType: string
+		lineageTag: c693ed83-9a1a-4233-8149-7d5871a7496f
+		summarizeBy: none
+		sourceColumn: Truck ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Trips Completed'
+		dataType: int64
+		formatString: 0
+		lineageTag: 367abebb-8266-4dcd-a929-8709bda14411
+		summarizeBy: sum
+		sourceColumn: Trips Completed
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total Hours Driven'
+		dataType: double
+		lineageTag: 185bb42f-1b69-4fd8-868a-372810cbfa93
+		summarizeBy: sum
+		sourceColumn: Total Hours Driven
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Safety Score'
+		dataType: int64
+		formatString: 0
+		lineageTag: 0f1a1f7f-8a6f-4e9a-a7ba-1f00b9864b88
+		summarizeBy: sum
+		sourceColumn: Safety Score
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Harsh Braking Events'
+		dataType: int64
+		formatString: 0
+		lineageTag: c6b87afe-892d-4761-aada-b35c35e586fe
+		summarizeBy: sum
+		sourceColumn: Harsh Braking Events
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Over-Speeding Events'
+		dataType: int64
+		formatString: 0
+		lineageTag: 2d3268a6-5067-40f4-ac57-ee7c4b3e9bfc
+		summarizeBy: sum
+		sourceColumn: Over-Speeding Events
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Excessive Idling Mins'
+		dataType: int64
+		formatString: 0
+		lineageTag: 96f3aed3-ddf6-41a1-a04c-95ba4e9e2ce0
+		summarizeBy: sum
+		sourceColumn: Excessive Idling Mins
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Late Deliveries'
+		dataType: int64
+		formatString: 0
+		lineageTag: 3423139c-8d43-40ea-8ee5-5753c030ee9c
+		summarizeBy: sum
+		sourceColumn: Late Deliveries
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fuel ECO Rating'
+		dataType: string
+		lineageTag: f6f1a3d1-d30f-422e-9b79-6698915b89c4
+		summarizeBy: none
+		sourceColumn: Fuel ECO Rating
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fuel ECO Category'
+		dataType: string
+		lineageTag: 31569d35-d894-47b1-9c21-e9ace39270fc
+		summarizeBy: none
+		sourceColumn: Fuel ECO Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Fuel ECO Description'
+		dataType: string
+		lineageTag: 48de95f3-ec3d-407c-a3ff-f56d79f66ca0
+		summarizeBy: none
+		sourceColumn: Fuel ECO Description
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Excessive Idling Hours'
+		dataType: double
+		lineageTag: 3136c2f5-2cde-456e-93ef-0bfbd49e95f7
+		summarizeBy: sum
+		sourceColumn: Excessive Idling Hours
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition DriverPerformance = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "driver_performance_actros_usd.csv"),[Delimiter=",", Columns=10, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Driver Name", type text}, {"Truck ID", type text}, {"Trips Completed", Int64.Type}, {"Total Hours Driven", type number}, {"Safety Score", Int64.Type}, {"Harsh Braking Events", Int64.Type}, {"Over-Speeding Events", Int64.Type}, {"Excessive Idling Mins", Int64.Type}, {"Late Deliveries", Int64.Type}, {"Fuel ECO Rating", type text}}),
+				    #"Trimmed Text" = Table.TransformColumns(#"Changed Type",{{"Driver Name", Text.Trim, type text}, {"Truck ID", Text.Trim, type text}, {"Fuel ECO Rating", Text.Trim, type text}}),
+				    #"Cleaned Text" = Table.TransformColumns(#"Trimmed Text",{{"Driver Name", Text.Clean, type text}, {"Truck ID", Text.Clean, type text}, {"Fuel ECO Rating", Text.Clean, type text}}),
+				    #"Added Custom" = Table.AddColumn(#"Cleaned Text", "Fuel ECO Category", each Text.BeforeDelimiter(
+				    Text.Trim([Fuel ECO Rating]),
+				    " - "
+				)),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Added Custom",{{"Fuel ECO Category", type text}}),
+				    #"Added Custom1" = Table.AddColumn(#"Changed Type1", "Fuel ECO Description", each Text.AfterDelimiter(
+				    Text.Trim([Fuel ECO Rating]),
+				    " - "
+				)),
+				    #"Added Custom2" = Table.AddColumn(#"Added Custom1", "Excessive Idling Hours", each [Excessive Idling Mins] / 60),
+				    #"Changed Type2" = Table.TransformColumnTypes(#"Added Custom2",{{"Fuel ECO Description", type text}, {"Excessive Idling Hours", type number}})
+				in
+				    #"Changed Type2"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

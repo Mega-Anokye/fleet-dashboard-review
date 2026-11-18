@@ -1,0 +1,149 @@
+table DimDate
+	lineageTag: a177f05c-66b0-4e66-aaf4-a0937b5fc900
+	dataCategory: Time
+
+	column Date
+		isUnique
+		isKey
+		formatString: General Date
+		lineageTag: e3d10cc3-a597-4dfd-8769-741c28cc777f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year
+		formatString: 0
+		lineageTag: 64fe5b55-f5ce-4234-8947-43cd35ab3e61
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Year]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Number'
+		formatString: 0
+		lineageTag: 372f188d-e3b2-4630-bbb8-a0553c0d5d3a
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Month Number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		lineageTag: 1275f356-197b-4390-a933-2741721dfe67
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Month]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Year'
+		lineageTag: 787dd7a7-db00-43b1-9df4-0b2a9c48962d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Month Year]
+		sortByColumn: 'Year Month'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Year Month'
+		formatString: 0
+		lineageTag: d482f365-9b6d-4646-855e-30eaf3f791ed
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Year Month]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quarter
+		lineageTag: 3e9d1654-29e4-4592-9a2f-d320a5909105
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Quarter]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Day
+		formatString: 0
+		lineageTag: afbae881-48df-4992-8b46-8f57d26615cc
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Day]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Day Name'
+		lineageTag: 05404fb6-0d75-462f-b075-c64b20421178
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Day Name]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimDate = calculated
+		mode: import
+		source =
+				
+				VAR StartDate =
+				    MINX(
+				        UNION(
+				            SELECTCOLUMNS(
+				                Fuel,
+				                "DateValue", Fuel[Date]
+				            ),
+				            SELECTCOLUMNS(
+				                Maintenance,
+				                "DateValue", Maintenance[Date]
+				            )
+				        ),
+				        [DateValue]
+				    )
+				
+				VAR EndDate =
+				    MAXX(
+				        UNION(
+				            SELECTCOLUMNS(
+				                Fuel,
+				                "DateValue", Fuel[Date]
+				            ),
+				            SELECTCOLUMNS(
+				                Maintenance,
+				                "DateValue", Maintenance[Date]
+				            )
+				        ),
+				        [DateValue]
+				    )
+				
+				RETURN
+				ADDCOLUMNS(
+				    CALENDAR(StartDate, EndDate),
+				
+				    "Year",
+				        YEAR([Date]),
+				
+				    "Month Number",
+				        MONTH([Date]),
+				
+				    "Month",
+				        FORMAT([Date], "MMM"),
+				
+				    "Month Year",
+				        FORMAT([Date], "MMM yyyy"),
+				
+				    "Year Month",
+				        YEAR([Date]) * 100 + MONTH([Date]),
+				
+				    "Quarter",
+				        "Q" & FORMAT([Date], "Q"),
+				
+				    "Day",
+				        DAY([Date]),
+				
+				    "Day Name",
+				        FORMAT([Date], "dddd")
+				)
+
+	annotation PBI_Id = a405edc3ee0040c3a5840fc4f670f669
+

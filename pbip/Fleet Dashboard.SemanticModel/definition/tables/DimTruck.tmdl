@@ -1,0 +1,34 @@
+table DimTruck
+	lineageTag: 6533ce4e-eef6-4f32-be01-7fd36dbd8f6d
+
+	column 'Truck ID'
+		lineageTag: 649eb49d-1cec-4604-9074-e91085fbfa3e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Truck ID]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimTruck = calculated
+		mode: import
+		source =
+				
+				DISTINCT(
+				    UNION(
+				        SELECTCOLUMNS(
+				            Fuel,
+				            "Truck ID", Fuel[Truck ID]
+				        ),
+				        SELECTCOLUMNS(
+				            Maintenance,
+				            "Truck ID", Maintenance[Truck ID]
+				        ),
+				        SELECTCOLUMNS(
+				            DriverPerformance,
+				            "Truck ID", DriverPerformance[Truck ID]
+				        )
+				    )
+				)
+
+	annotation PBI_Id = 20c9e999ffc64959b7d1bcb2ae651c22
+

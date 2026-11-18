@@ -1,0 +1,26 @@
+table 'Cost Category'
+	lineageTag: 99b5fe98-d469-4d8a-90ef-23df77eeebb6
+
+	column 'Cost Type'
+		lineageTag: 93014a39-9d2a-40a7-b969-4391f4e61e3c
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Cost Type]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Cost Category' = calculated
+		mode: import
+		source =
+				
+				DATATABLE(
+				    "Cost Type",
+				    STRING,
+				    {
+				        {"Fuel"},
+				        {"Maintenance"}
+				    }
+				)
+
+	annotation PBI_Id = 352fa82ec52c46a1b24e1128a3777700
+

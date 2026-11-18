@@ -1,0 +1,8 @@
+/// Folder holding the three CSVs in the repo's data/ folder. Change this to where you cloned the repo, then Refresh.
+expression DataFolder = "C:\fleet-dashboard-review\data\" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 6f1c2a4e-9b3d-4e7a-8c21-5d0f3b7a9e14
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+

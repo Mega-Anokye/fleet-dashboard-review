@@ -1,0 +1,387 @@
+table _Measures_
+	lineageTag: d383c713-716c-4691-91cc-9d50f8f2f8e3
+
+	measure 'Total Fuel Cost' =
+			
+			SUM(Fuel[Fuel Cost USD])
+		formatString: \$#,0
+		displayFolder: Fuel
+		lineageTag: 3a69cc8f-403c-41a1-b927-cff856fc1416
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Total Fuel Litres' =
+			
+			SUM(Fuel[Fill / Lit])
+		formatString: #,0
+		displayFolder: Fuel
+		lineageTag: c8d273e2-cbf3-4fc3-9eb5-9ccaa59be478
+
+	measure 'Total Distance' =
+			
+			SUM(Fuel[Dist Covered])
+		formatString: #,0
+		displayFolder: Fuel
+		lineageTag: 82051e12-e6ee-4a1d-bf20-7fe3b40c928a
+
+	/// Kilometres per litre (total km / total litres)
+	measure 'Average Fuel Efficiency' = DIVIDE([Total Distance], [Total Fuel Litres])
+		formatString: 0.00
+		displayFolder: Fuel
+		lineageTag: 1556fb65-62e5-486b-bd15-ab8003d59ca1
+
+	measure 'Average Fuel Price' = DIVIDE([Total Fuel Cost], [Total Fuel Litres])
+		formatString: \$0.00
+		displayFolder: Fuel
+		lineageTag: 6e5860de-85b7-46c3-99df-22ba55849d12
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Fuel Transactions' =
+			
+			COUNTROWS(Fuel)
+		formatString: #,0
+		displayFolder: Fuel
+		lineageTag: 31f57e6e-c0f2-4edf-a2b1-c4e84400a490
+
+	measure 'Trucks Fuelled' =
+			
+			DISTINCTCOUNT(Fuel[Truck ID])
+		formatString: #,0
+		displayFolder: Fuel
+		lineageTag: 58e0f0b8-4ff4-40b7-a6c0-aece86fad42a
+
+	measure 'Fuel Cost per KM' = DIVIDE([Total Fuel Cost], [Total Distance])
+		formatString: \$0.000
+		displayFolder: Fuel
+		lineageTag: 0740b552-98e1-40d9-96c7-0a9e90fc24cf
+
+	measure 'Total Maintenance Cost' =
+			
+			SUM(Maintenance[Cost_USD])
+		formatString: \$#,0
+		displayFolder: Maintenance
+		lineageTag: 56f94b53-8d67-401f-bf2e-e9c12f707574
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Total Maintenance Jobs' =
+			
+			COUNTROWS(Maintenance)
+		formatString: #,0
+		displayFolder: Maintenance
+		lineageTag: c9a885a2-1a0a-446a-8a96-4ce6d8c5708d
+
+	/// Downtime in days
+	measure 'Total Downtime' =
+			
+			SUM(Maintenance[Downtime_Days])
+		formatString: #,0.0
+		displayFolder: Maintenance
+		lineageTag: 9cc6284c-7550-410f-9a76-e29fd29b3d0c
+
+	measure 'Preventive Jobs' =
+			
+			CALCULATE(
+			    [Total Maintenance Jobs],
+			    Maintenance[Maintenance Type] = "Preventive"
+			)
+		formatString: #,0
+		displayFolder: Maintenance
+		lineageTag: b487ed5e-d559-49b4-809f-360dcce12508
+
+	measure 'Corrective Jobs' =
+			
+			CALCULATE(
+			    [Total Maintenance Jobs],
+			    Maintenance[Maintenance Type] = "Corrective"
+			)
+		formatString: #,0
+		displayFolder: Maintenance
+		lineageTag: ecd454d9-6291-4349-8d74-4f24e127a961
+
+	measure 'Critical Jobs' =
+			
+			CALCULATE(
+			    [Total Maintenance Jobs],
+			    Maintenance[Priority] = "Critical"
+			)
+		formatString: #,0
+		displayFolder: Maintenance
+		lineageTag: e603713e-6624-4f68-8031-3b58419ae27d
+
+	measure 'Average Maintenance Cost' = DIVIDE([Total Maintenance Cost], [Total Maintenance Jobs])
+		formatString: \$#,0
+		displayFolder: Maintenance
+		lineageTag: 233d9225-c437-4002-a769-c4ebe02ca1e1
+
+	/// Average downtime days per job
+	measure 'Average Downtime' = DIVIDE([Total Downtime], [Total Maintenance Jobs])
+		formatString: 0.0
+		displayFolder: Maintenance
+		lineageTag: 62deef28-80ac-400e-b6fc-4467927a766f
+
+	measure 'Preventive Maintenance %' = DIVIDE([Preventive Jobs], [Total Maintenance Jobs])
+		formatString: 0.0%
+		displayFolder: Maintenance
+		lineageTag: 6196faea-8e86-4b0e-a1a5-cab399185b8e
+
+	measure 'Maintenance Cost per KM' = DIVIDE([Total Maintenance Cost], [Total Distance])
+		formatString: \$0.000
+		displayFolder: Maintenance
+		lineageTag: e5ca2072-02c8-42dd-a875-7c6bded216cf
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Average Safety Score' =
+			
+			AVERAGE(DriverPerformance[Safety Score])
+		formatString: 0.0
+		displayFolder: Driver
+		lineageTag: dab9a06c-5416-42cc-a860-848ef955c37c
+
+	measure 'Total Trips' =
+			
+			SUM(DriverPerformance[Trips Completed])
+		formatString: #,0
+		displayFolder: Driver
+		lineageTag: 2201d0df-58a0-4672-b758-de81c1126a9f
+
+	measure 'Total Late Deliveries' =
+			
+			SUM(DriverPerformance[Late Deliveries])
+		formatString: #,0
+		displayFolder: Driver
+		lineageTag: a7326d44-c567-4eaa-b421-dd8a1b651085
+
+	measure 'Total Harsh Braking' =
+			
+			SUM(DriverPerformance[Harsh Braking Events])
+		formatString: #,0
+		displayFolder: Driver
+		lineageTag: 0cd4342d-abca-4806-a84c-3e9e46746788
+
+	measure 'Total Over Speeding' =
+			
+			SUM(DriverPerformance[Over-Speeding Events])
+		formatString: #,0
+		displayFolder: Driver
+		lineageTag: a47ba4de-865e-43fa-bf4e-dc5b2c4256d5
+
+	measure 'Excessive Idling Hours' = DIVIDE(SUM(DriverPerformance[Excessive Idling Mins]), 60)
+		formatString: #,0
+		displayFolder: Driver
+		lineageTag: 590fe2d8-51d5-47ce-a19c-c86488591770
+
+	measure 'Total Hours Driven' =
+			
+			SUM(DriverPerformance[Total Hours Driven])
+		formatString: #,0
+		displayFolder: Driver
+		lineageTag: 51a89b66-eba3-4686-88f2-22ea9aad1213
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Late Delivery Rate' = DIVIDE([Total Late Deliveries], [Total Trips])
+		formatString: 0.0%
+		displayFolder: Driver
+		lineageTag: 01509976-680f-4295-b882-56b67b550db7
+
+	measure 'Total Fleet Trucks' =
+			
+			DISTINCTCOUNT(DimTruck[Truck ID])
+		formatString: #,0
+		displayFolder: Fleet
+		lineageTag: 1f830ad9-ea79-4e50-90b0-1ee9635cfe1f
+
+	measure 'Trucks with Driver Data' =
+			
+			DISTINCTCOUNT(DriverPerformance[Truck ID])
+		formatString: #,0
+		displayFolder: Checks
+		lineageTag: 9e37a10a-99fd-49b1-93a6-4df2d17bcb6b
+
+	measure 'Trucks Missing Driver Data' =
+			
+			[Total Fleet Trucks] -
+			[Trucks with Driver Data]
+		formatString: #,0
+		displayFolder: Checks
+		lineageTag: 6abccec0-90b1-4a6d-aec0-bf90d814cd38
+
+	measure 'Total Recorded Operating Cost' =
+			
+			[Total Fuel Cost] +
+			[Total Maintenance Cost]
+		formatString: \$#,0
+		displayFolder: Fleet
+		lineageTag: ba6e5a5c-c1e1-4fa8-8f45-fcd66644c4cc
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Operating Cost by Category' =
+			
+			SWITCH(
+			    SELECTEDVALUE('Cost Category'[Cost Type]),
+			    "Fuel", [Total Fuel Cost],
+			    "Maintenance", [Total Maintenance Cost]
+			)
+		formatString: \$#,0
+		displayFolder: Fleet
+		lineageTag: 1768b28a-13f7-42a0-b2a9-fc4a5178bc5b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Operating Cost by Truck' =
+			
+			[Total Fuel Cost] + [Total Maintenance Cost]
+		formatString: \$#,0
+		displayFolder: Fleet
+		lineageTag: b5f1acef-11a2-49d4-b8b8-46d8c402cdaa
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Fuel cost + maintenance cost (USD)
+	measure 'Total Operating Cost' = [Total Fuel Cost] + [Total Maintenance Cost]
+		formatString: \$#,0
+		displayFolder: Fleet
+		lineageTag: 8fa71a6c-6c9e-45fd-b922-0e9b2308064d
+
+	measure 'Operating Cost per KM' = DIVIDE([Total Operating Cost], [Total Distance])
+		formatString: \$0.000
+		displayFolder: Fleet
+		lineageTag: be5f600a-bed7-45e8-86e9-b1d49a9d2850
+
+	measure 'Fuel Share of Operating Cost' = DIVIDE([Total Fuel Cost], [Total Operating Cost])
+		formatString: 0.0%
+		displayFolder: Fleet
+		lineageTag: b1d22092-d467-4bbb-a585-2b80ec442e23
+
+	measure Drivers = DISTINCTCOUNT(DriverPerformance[Driver Name])
+		formatString: #,0
+		displayFolder: Driver
+		lineageTag: 28fe6ebe-5ba2-4c02-a463-9d20c41634d9
+
+	/// Harsh braking events per 100 completed trips, so drivers with more trips are compared fairly
+	measure 'Harsh Braking per 100 Trips' = DIVIDE([Total Harsh Braking], [Total Trips]) * 100
+		formatString: 0.0
+		displayFolder: Driver
+		lineageTag: 24ae6cb3-3091-44a5-8db8-5ff9d7cc09cf
+
+	measure 'Over-Speeding per 100 Trips' = DIVIDE([Total Over Speeding], [Total Trips]) * 100
+		formatString: 0.0
+		displayFolder: Driver
+		lineageTag: 825f9b06-64ce-45f9-9a8f-7129773372c6
+
+	measure 'Idling % of Hours Driven' = DIVIDE([Excessive Idling Hours], [Total Hours Driven])
+		formatString: 0.0%
+		displayFolder: Driver
+		lineageTag: c0fff2d5-53a6-4bd7-97ee-c15c47eb7e2a
+
+	/// How many fuel records carry this coupon number (all dates, all trucks)
+	measure 'Coupon Use Count' = CALCULATE(COUNTROWS(Fuel), ALLEXCEPT(Fuel, Fuel[Coupon #]))
+		formatString: #,0
+		displayFolder: Checks
+		lineageTag: 652fa10d-e7ad-478e-8048-278dfbc12b80
+
+	measure 'Duplicate Coupon Numbers' = COUNTROWS(FILTER(VALUES(Fuel[Coupon #]), [Coupon Use Count] > 1)) + 0
+		formatString: #,0
+		displayFolder: Checks
+		lineageTag: f115c7c2-523e-4c51-9eb0-2eb1e9b86dea
+
+	measure 'Check - Fuel Rows' = COUNTROWS(Fuel)
+		formatString: #,0
+		displayFolder: Checks
+		lineageTag: f875bbc2-f50f-4022-bc5b-b7d5dbe32cbf
+
+	measure 'Check - Fuel Duplicate SN' = COUNTROWS(Fuel) - DISTINCTCOUNT(Fuel[SN])
+		formatString: #,0
+		displayFolder: Checks
+		lineageTag: ee54dfd1-b54b-446b-a1c1-17cbb6dbe887
+
+	measure 'Check - Maintenance Rows' = COUNTROWS(Maintenance)
+		formatString: #,0
+		displayFolder: Checks
+		lineageTag: 0f708884-36c4-4bb6-8187-55eec6f1f520
+
+	measure 'Check - Maintenance Duplicate SN' = COUNTROWS(Maintenance) - DISTINCTCOUNT(Maintenance[SN])
+		formatString: #,0
+		displayFolder: Checks
+		lineageTag: 5ca550d4-fb85-412b-bf9f-836b524b3357
+
+	measure 'Check - Invalid ODO Rows' = COUNTROWS(FILTER(Fuel, Fuel[ODO Validation] <> "Valid" || Fuel[Dist Covered] <> Fuel[End ODO] - Fuel[Start ODO])) + 0
+		formatString: #,0
+		displayFolder: Checks
+		lineageTag: 9258a141-df8e-4a55-a7b2-c17f208f8037
+
+	/// Difference between recalculated fuel cost (litres x pump rate) and recorded cost
+	measure 'Check - Fuel Cost vs Litres x Rate' = SUMX(Fuel, Fuel[Fill / Lit] * Fuel[Pump Rate USD]) - SUM(Fuel[Fuel Cost USD])
+		formatString: \$#,0;-\$#,0;\$0
+		displayFolder: Checks
+		lineageTag: e8ff2462-7098-4d95-8af0-5e7bd9f62244
+
+	measure 'Check - Jobs Reconcile' = [Total Maintenance Jobs] - [Preventive Jobs] - [Corrective Jobs]
+		formatString: #,0
+		displayFolder: Checks
+		lineageTag: 3e8cdaf1-f55c-49ad-9549-7eb7f6b0bc39
+
+	measure 'Check - Driver Trips vs Fuel Records' = CALCULATE([Total Trips], REMOVEFILTERS()) - CALCULATE(COUNTROWS(Fuel), REMOVEFILTERS())
+		formatString: #,0
+		displayFolder: Checks
+		lineageTag: 4a430690-28c5-4f58-9d5b-baf688166b02
+
+	measure 'Insight - Overview' =
+			VAR topTruck = TOPN(1, VALUES(DimTruck[Truck ID]), [Total Operating Cost], DESC)
+			VAR topName = MAXX(topTruck, DimTruck[Truck ID])
+			VAR topCost = MAXX(topTruck, [Total Operating Cost])
+			RETURN "Fuel is " & FORMAT([Fuel Share of Operating Cost], "0%") & " of operating cost, so fuel efficiency is the biggest cost lever. The fleet spends " & FORMAT([Operating Cost per KM], "$0.000") & " per km. Highest-cost truck: " & topName & " (" & FORMAT(topCost, "$#,0") & ")."
+		displayFolder: Insights
+		lineageTag: b1edc854-9bb2-4dd2-8e74-8e54d746d03c
+
+	measure 'Insight - Fuel' =
+			VAR t = TOPN(1, FILTER(VALUES(DimTruck[Truck ID]), NOT ISBLANK([Average Fuel Efficiency])), [Average Fuel Efficiency], ASC)
+			VAR worst = MAXX(t, DimTruck[Truck ID])
+			VAR worstKmL = MAXX(t, [Average Fuel Efficiency])
+			RETURN "Fleet average is " & FORMAT([Average Fuel Efficiency], "0.00") & " km/L. Least efficient truck: " & worst & " at " & FORMAT(worstKmL, "0.00") & " km/L. " & FORMAT([Duplicate Coupon Numbers], "#,0") & " coupon numbers appear on more than one fill and should be checked."
+		displayFolder: Insights
+		lineageTag: b3de05ec-800b-49a4-bde4-5292481e78df
+
+	measure 'Insight - Maintenance' =
+			VAR top5 = TOPN(5, VALUES(DimTruck[Truck ID]), [Total Maintenance Cost], DESC)
+			VAR top5Cost = CALCULATE([Total Maintenance Cost], top5)
+			VAR share5 = DIVIDE(top5Cost, [Total Maintenance Cost])
+			RETURN "Preventive work is " & FORMAT([Preventive Maintenance %], "0%") & " of jobs. The 5 costliest trucks take " & FORMAT(share5, "0%") & " of maintenance spend. " & FORMAT([Critical Jobs], "#,0") & " critical jobs; each job costs " & FORMAT([Average Downtime], "0.0") & " days of downtime on average."
+		displayFolder: Insights
+		lineageTag: 1ebc7537-5f29-4506-869b-2bf1f11e2461
+
+	measure 'Insight - Driver' =
+			VAR t = TOPN(1, FILTER(VALUES(DimDriver[Driver Name]), NOT ISBLANK([Harsh Braking per 100 Trips])), [Harsh Braking per 100 Trips], DESC)
+			VAR nm = MAXX(t, DimDriver[Driver Name])
+			VAR v = MAXX(t, [Harsh Braking per 100 Trips])
+			RETURN "Rankings are per 100 trips: a few drivers did about twice the trips, so raw counts overstate their risk. Highest harsh-braking rate: " & nm & " (" & FORMAT(v, "0.0") & " per 100 trips vs fleet " & FORMAT([Harsh Braking per 100 Trips], "0.0") & ")."
+		displayFolder: Insights
+		lineageTag: d0f3f68c-8fe3-4ff6-8127-3320334b0c58
+
+	column 'Measure Holder'
+		isHidden
+		lineageTag: aee2e015-1f64-4bdf-af47-ecc875e1fc1d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Measure Holder]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures_ = calculated
+		mode: import
+		source =
+				
+				DATATABLE(
+				    "Measure Holder",
+				    STRING,
+				    {
+				        {"Measures"}
+				    }
+				)
+
+	annotation PBI_Id = a519a254e6d444eeba2f15172f03b583
+
